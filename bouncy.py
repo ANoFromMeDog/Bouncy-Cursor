@@ -24,7 +24,7 @@ def onkeypress(event):
 
 on_press(onkeypress)
 
-def giverandvec():
+def giverandvec(mag):
     vec=[0,0]
     ang = randint(0, 360)
     vec = [mag*sin(ang), mag*cos(ang)]
@@ -42,9 +42,9 @@ def bouncethemouse(mag,offset,gravitybool):
 
     nextPos=[0,0]
     oldPos=[0,0]
-    res=[3840,1080]
+    res=[1920,1080]
 
-    gravity=0.5
+    gravity=0.05
     energyloss=0.95
     buffer=5
     
@@ -54,7 +54,7 @@ def bouncethemouse(mag,offset,gravitybool):
     #Generate Initial Direction
     ###############################
     refTime=time()
-    vec=giverandvec()
+    vec=giverandvec(mag)
     refPos = get_position()
     nextPos = list(refPos)
     oldPos = list(refPos)
