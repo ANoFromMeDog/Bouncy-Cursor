@@ -6,15 +6,7 @@ from time import time
 from random import randint
 from math import sin, cos, floor
 from time import sleep
-from win32api import GetLastError, SetCursorPos,GetCursorPos,EnumDisplayMonitors
-
-
-###############################
-#Global Variables
-###############################
-vecoffset=(0,0)
-stop = False
-fullstop = False
+from win32api import SetCursorPos,GetCursorPos,EnumDisplayMonitors
 
 ###############################
 #Keyboard Listener
@@ -24,20 +16,24 @@ def onkeypress(event):
     global fullstop
     global vecoffset
     global gravitybool
+    global energyconst
+    
     
     if event.name == 'f12':
         fullstop=True
-    elif event.name != 'f11':
+    elif event.name == 'f11':
         gravitybool=True
-    elif event.name != 'f10':
+        energyconst=0.95
+    elif event.name == 'f10':
         gravitybool=False
-    elif event.name != 'up':
-        vecoffset=[0,arrowkeymag]
-    elif event.name != 'down':
+        energyconst=1
+    elif event.name == 'up':
         vecoffset=[0,-arrowkeymag]
-    elif event.name != 'left':
+    elif event.name == 'down':
+        vecoffset=[0,arrowkeymag]
+    elif event.name == 'left':
         vecoffset=[-arrowkeymag,0]
-    elif event.name != 'right':
+    elif event.name == 'right':
         vecoffset=[arrowkeymag,0]
     elif event.name != '':
         stop = True
@@ -128,12 +124,13 @@ def createrectangles():
         rect_initial.append(Rect(item[2]))
 
     #If Length is 1 don't try to combine
-    if (len(rect) == 1 ):
+    if (len(rect_initial) == 1 ):
         rect=rect_initial
         return rect
     
     # Combine Rectangles if possible
     while(rect_initial):
+        result=0
         cur_rect=rect_initial.pop(0)
         if (len(rect_initial) == 0 ):
             rect.append(cur_rect)
@@ -194,7 +191,7 @@ def bouncethemouse():
         #Exit Due to Keyboard or Mouse Movement
         if ((refPos[0] != floor(nextPos[0])) | stop)  :
             FailSafe = False
-            print("Exit from failsafe")
+            #print("Exit from failsafe")
             
         if curtime >= refTime:
             refTime = curtime + offset
@@ -202,6 +199,7 @@ def bouncethemouse():
                 if(item.pointinrectangle(refPos)):
                     rectangle=item
                     break
+            
             vec=[vec[0]+vecoffset[0],vec[1]+vecoffset[1]]
             vecoffset=[0,0]       
                    
@@ -220,26 +218,32 @@ def bouncethemouse():
             #If it is going off map reflect
             if(offMap):
                 if (floor(nextPos[0])<=rectangle.xint[0] or floor(nextPos[0])>=rectangle.xint[1] ):
-                    print("inverting x")
-                    vec[0] = -vec[0] * energyloss
+                    #print("inverting x")
+                    vec[0] = -vec[0] * energyconst
                 if (floor(nextPos[1])<=rectangle.yint[0] or floor(nextPos[1])>=rectangle.yint[1] ):
-                    print("inverting y")
-                    vec[1] = -vec[1] * energyloss
+                    #print("inverting y")
+                    vec[1] = -vec[1] * energyconst
                 nextPos = tuple(map(sum, zip(vec, oldPos)))
                 
             SetCursorPos((floor(nextPos[0]), floor(nextPos[1])))
                     
 
             offMap=True
-            oldPos=nextPos              
-    
+            oldPos=nextPos   
 
+           
+###############################
+#Global Variables
+###############################
+vecoffset=(0,0)
+stop = False
+fullstop = False    
 
 ###############################
 # Config Variables 
 ###############################
 gravitybool=True
-arrowkeymag=1
+arrowkeymag=10
 timeout=1
 refresh = 60
 speed=300
@@ -250,10 +254,11 @@ energyloss=0.95
 
 offset = 1/refresh
 mag=speed/refresh
+energyconst=energyloss
 if(not gravity):
     mag*=2
     arrowkeymag/=5
-    energyloss= 1
+    energyconst= 1
 
 ###############################
 #Main Code Loop

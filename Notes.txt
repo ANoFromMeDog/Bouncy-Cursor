@@ -1,0 +1,14 @@
+Issues to Fix:
+Idle consumption of resources
+Optimization/Remove redundant instructions
+
+
+
+Features to Add:
+Create config file
+Compile with icon included
+Readd corner hit feature
+
+
+Compile command:
+pyinstaller --onedir --onefile --noconsole --icon bouncycursor.ico -n Bouncy.exe
